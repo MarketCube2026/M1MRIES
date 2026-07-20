@@ -1,41 +1,59 @@
 # 会议资源支持评分系统
 
-这是一个市场部会议资源支持评分与 Excel 留档系统。
+这是一个市场部会议资源支持评分工具，支持会议申请录入、评分计算、过往申请查看和导出。
 
-## 功能
+## 运行方式
 
-- 会议申请信息录入
-- 评分自动计算
-- 汇报评价自动生成
-- 过往申请一览与导出
-- 内网同事统一申请记录同步
-- 保存后追加写入 Excel：`资源支持价值评估评分表2026版.xlsx`
+### 公网版本（推荐）
 
-## 本机访问
+1. 在 Supabase 创建项目。
+2. 打开 Supabase SQL Editor，执行 `supabase_schema.sql`。
+3. 在 Supabase Auth 中创建内部同事账号。
+4. 修改 `cloud-config.js`：
 
-服务启动后访问：
+```js
+window.MEETING_SUPPORT_CLOUD_CONFIG = {
+  enabled: true,
+  supabaseUrl: "https://你的项目.supabase.co",
+  supabaseAnonKey: "你的 anon public key",
+  tableName: "applications",
+  authRequired: true
+};
+```
+
+5. 将 `index.html`、`history.html`、`cloud-config.js`、`cloud-data.js` 发布到 GitHub Pages。
+
+配置完成后，同事通过 GitHub Pages 公网地址访问，申请记录会保存到 Supabase 云数据库，电脑关机或本地服务关闭不会影响使用。
+
+### 本地/内网版本
+
+如果 `cloud-config.js` 中 `enabled` 为 `false`，系统会继续兼容当前本地服务：
 
 - 评分页：http://localhost:8036/index.html
 - 过往申请页：http://localhost:8036/history.html
 - 健康检查：http://localhost:8036/api/health
 
-## 内网访问
+本地服务启动后，数据会写入 `applications.json`，并追加到 `资源支持价值评估评分表2026版.xlsx`。
 
-在主机电脑开机并登录后，同一内网同事可访问：
+## 数据说明
 
-- 评分页：http://10.5.2.31:8036/index.html
-- 过往申请页：http://10.5.2.31:8036/history.html
+- 公网版本以 Supabase `applications` 表作为主数据源。
+- 过往申请页从云端读取同一份记录，支持查看、删除、清空和导出 CSV。
+- 本地 Excel 不再作为公网版本的实时数据库；如需 Excel 文件，可在过往申请页导出。
 
-如同事无法访问，请检查 Windows 防火墙或让 IT 放行主机 TCP 入站端口 `8036`。
+## GitHub Pages 注意事项
 
-## 启动方式
+GitHub Pages 只能托管静态网页，不能运行 Python 后端，也不能直接写入本机 Excel。  
+因此公网共享时应使用：
 
-双击：
+- GitHub Pages：托管页面
+- Supabase：保存和读取申请数据
 
-`启动评分系统.bat`
+## 主要文件
 
-系统也配置了 Windows 当前用户登录后自动启动。注意：如果电脑停在登录界面，服务不会自动运行；若需无人登录也运行，需要 IT/管理员注册 Windows 服务或管理员计划任务。
-
-## GitHub 说明
-
-GitHub Pages 只能运行静态页面，不能运行本项目的 Python 后端，也不能写入本机 Excel。因此 GitHub 主要用于备份和分发代码；实际运行请在内网主机电脑上启动本地服务。
+- `index.html`：评分申请页面
+- `history.html`：过往申请一览页面
+- `cloud-config.js`：云端配置
+- `cloud-data.js`：云端/本地兼容数据层
+- `supabase_schema.sql`：Supabase 建表和权限 SQL
+- `excel_server.py`：本地/内网兼容服务

@@ -814,6 +814,8 @@
     </div>
   </main>
 
+  <script src="cloud-config.js"></script>
+  <script src="cloud-data.js"></script>
   <script>
     const scoreMaps = {
       meetingLevel: {
@@ -921,6 +923,7 @@
     const storageKey = "meetingSupportApplications";
     let savedApplications = loadApplications();
     let currentRecord = null;
+    let dataSourceLabel = "";
 
     const example = {
       applicant: "张三",
@@ -1035,6 +1038,21 @@
 
     function persistApplications() {
       localStorage.setItem(storageKey, JSON.stringify(savedApplications));
+    }
+
+    async function refreshSavedApplications(options = {}) {
+      if (!window.MeetingSupportData) return;
+      try {
+        const result = await MeetingSupportData.listRecords(storageKey);
+        savedApplications = Array.isArray(result.records) ? result.records : [];
+        dataSourceLabel = result.source === "cloud" ? "云端数据库" : result.source === "local-server" ? "本地服务" : "浏览器缓存";
+        persistApplications();
+        renderApplicationTable();
+      } catch (error) {
+        if (options.showError) {
+          elements.copyState.textContent = `同步失败：${error.message}`;
+        }
+      }
     }
 
     function formatAmount(value) {
@@ -1207,24 +1225,8 @@
       });
 
       if (elements.historyCount) {
-        elements.historyCount.textContent = `当前填写内容会实时同步到表格第一行；已保存 ${savedApplications.length} 条过往申请。`;
-      }
-    }
-
-    async function saveRecordToExcel(record) {
-      try {
-        const response = await fetch("/api/save-excel", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(record)
-        });
-        const result = await response.json();
-        if (!response.ok || !result.ok) {
-          throw new Error(result.error || "Excel 写入失败");
-        }
-        return result;
-      } catch (error) {
-        return { ok: false, error: error.message };
+        const source = dataSourceLabel ? `；数据来源：${dataSourceLabel}` : "";
+        elements.historyCount.textContent = `当前填写内容会实时同步到表格第一行；已保存 ${savedApplications.length} 条过往申请${source}。`;
       }
     }
 
@@ -1239,28 +1241,55 @@
       savedApplications.unshift(saved);
       persistApplications();
       renderApplicationTable();
-      elements.copyState.textContent = "当前申请已保存到过往申请一览，正在同步 Excel...";
-      const excelResult = await saveRecordToExcel(saved);
-      if (excelResult.ok) {
-        elements.copyState.textContent = `当前申请已保存，并已同步至 Excel 第 ${excelResult.row} 行。`;
-      } else {
-        elements.copyState.textContent = `当前申请已保存到浏览器本地，但 Excel 同步失败：${excelResult.error}`;
+      elements.copyState.textContent = "当前申请已保存到过往申请一览，正在同步数据...";
+      try {
+        const result = window.MeetingSupportData
+          ? await MeetingSupportData.saveRecord(saved, storageKey)
+          : { ok: true, source: "browser", record: saved };
+        if (result.record) {
+          savedApplications = [result.record, ...savedApplications.filter((record) => record.id !== result.record.id)];
+          persistApplications();
+          renderApplicationTable();
+        }
+        if (result.source === "cloud") {
+          elements.copyState.textContent = "当前申请已保存，并已同步至云端数据库。";
+        } else if (result.source === "local-server" && result.row) {
+          elements.copyState.textContent = `当前申请已保存，并已同步至本地 Excel 第 ${result.row} 行。`;
+        } else {
+          elements.copyState.textContent = "当前申请已保存到浏览器缓存；配置 Supabase 后可自动同步到公网云端。";
+        }
+      } catch (error) {
+        elements.copyState.textContent = `保存到云端失败，当前记录已保留在浏览器缓存：${error.message}`;
       }
     }
 
-    function deleteApplication(id) {
-      savedApplications = savedApplications.filter((record) => record.id !== id);
-      persistApplications();
-      renderApplicationTable();
+    async function deleteApplication(id) {
+      try {
+        const result = window.MeetingSupportData
+          ? await MeetingSupportData.deleteRecord(id, storageKey)
+          : { records: savedApplications.filter((record) => record.id !== id) };
+        savedApplications = Array.isArray(result.records) ? result.records : savedApplications.filter((record) => record.id !== id);
+        persistApplications();
+        renderApplicationTable();
+      } catch (error) {
+        elements.copyState.textContent = `删除失败：${error.message}`;
+      }
     }
 
-    function clearHistory() {
+    async function clearHistory() {
       if (!savedApplications.length) return;
       const confirmed = window.confirm("确认清空全部过往申请记录？当前填写内容不会被清空。");
       if (!confirmed) return;
-      savedApplications = [];
-      persistApplications();
-      renderApplicationTable();
+      try {
+        const result = window.MeetingSupportData
+          ? await MeetingSupportData.clearRecords(storageKey)
+          : { records: [] };
+        savedApplications = Array.isArray(result.records) ? result.records : [];
+        persistApplications();
+        renderApplicationTable();
+      } catch (error) {
+        elements.copyState.textContent = `清空失败：${error.message}`;
+      }
     }
 
     function setBar(element, score, max) {
@@ -1403,6 +1432,10 @@
     document.getElementById("resetForm").addEventListener("click", resetForm);
     document.getElementById("printReport").addEventListener("click", () => window.print());
     document.getElementById("copyEvaluation").addEventListener("click", copyEvaluation);
+    if (window.MeetingSupportData) {
+      MeetingSupportData.mountCloudBar(document.querySelector(".shell"));
+      window.addEventListener("meeting-support-cloud-auth", () => refreshSavedApplications({ showError: true }));
+    }
 
     try {
       const pendingRecord = sessionStorage.getItem("meetingSupportLoadRecord");
@@ -1415,6 +1448,7 @@
     }
 
     calculate();
+    refreshSavedApplications();
   </script>
 </body>
 </html>

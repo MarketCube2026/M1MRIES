@@ -430,6 +430,8 @@
     </section>
   </main>
 
+  <script src="cloud-config.js"></script>
+  <script src="cloud-data.js"></script>
   <script>
     const storageKey = "meetingSupportApplications";
     const elements = {
@@ -448,18 +450,19 @@
     };
 
     let applications = [];
+    let dataSourceLabel = "";
 
     async function loadApplications() {
       try {
-        const response = await fetch("/api/applications", { cache: "no-store" });
-        const payload = await response.json();
-        if (response.ok && payload.ok && Array.isArray(payload.records)) {
-          localStorage.setItem(storageKey, JSON.stringify(payload.records));
-          return payload.records;
-        }
+        const result = window.MeetingSupportData
+          ? await MeetingSupportData.listRecords(storageKey)
+          : { records: [] };
+        dataSourceLabel = result.source === "cloud" ? "云端数据库" : result.source === "local-server" ? "本地服务" : "浏览器缓存";
+        if (Array.isArray(result.records)) return result.records;
       } catch (error) {
         const raw = localStorage.getItem(storageKey);
         const parsed = raw ? JSON.parse(raw) : [];
+        dataSourceLabel = "浏览器缓存";
         return Array.isArray(parsed) ? parsed : [];
       }
       return [];
@@ -491,7 +494,8 @@
       const now = new Date();
       const pad = (num) => String(num).padStart(2, "0");
       const time = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-      elements.tableCount.textContent = `共 ${count} 条记录，已自动同步 ${time}`;
+      const source = dataSourceLabel ? `，数据来源：${dataSourceLabel}` : "";
+      elements.tableCount.textContent = `共 ${count} 条记录，已自动同步 ${time}${source}`;
     }
 
     function formatAmount(value) {
@@ -630,15 +634,14 @@
       deleteButton.textContent = "删除";
       deleteButton.addEventListener("click", async () => {
         try {
-          const response = await fetch(`/api/applications?id=${encodeURIComponent(record.id)}`, { method: "DELETE" });
-          const payload = await response.json();
-          if (response.ok && payload.ok && Array.isArray(payload.records)) {
-            applications = payload.records;
-            persistApplications();
-            render();
-          }
+          const result = window.MeetingSupportData
+            ? await MeetingSupportData.deleteRecord(record.id, storageKey)
+            : { records: applications.filter((item) => item.id !== record.id) };
+          applications = Array.isArray(result.records) ? result.records : applications.filter((item) => item.id !== record.id);
+          persistApplications();
+          render();
         } catch (error) {
-          window.alert("删除失败，请确认服务正常运行。");
+          window.alert(`删除失败：${error.message}`);
         }
       });
 
@@ -750,15 +753,14 @@
       const confirmed = window.confirm("确认清空全部过往申请记录？");
       if (!confirmed) return;
       try {
-        const response = await fetch("/api/clear-applications", { method: "POST" });
-        const payload = await response.json();
-        if (response.ok && payload.ok) {
-          applications = [];
-          persistApplications();
-          render();
-        }
+        const result = window.MeetingSupportData
+          ? await MeetingSupportData.clearRecords(storageKey)
+          : { records: [] };
+        applications = Array.isArray(result.records) ? result.records : [];
+        persistApplications();
+        render();
       } catch (error) {
-        window.alert("清空失败，请确认服务正常运行。");
+        window.alert(`清空失败：${error.message}`);
       }
     });
     document.getElementById("exportHistory").addEventListener("click", exportHistory);
@@ -772,6 +774,10 @@
       if (!document.hidden) syncApplications();
     });
     window.setInterval(() => syncApplications(), 2000);
+    if (window.MeetingSupportData) {
+      MeetingSupportData.mountCloudBar(document.querySelector(".shell"));
+      window.addEventListener("meeting-support-cloud-auth", () => syncApplications({ force: true }));
+    }
 
     syncApplications({ force: true });
   </script>
