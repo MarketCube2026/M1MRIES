@@ -1,0 +1,222 @@
+[
+  {
+    "id": "app-1784270276489-7cccfcce844d48",
+    "status": "saved",
+    "updatedAt": "2026-07-17T06:37:56.489Z",
+    "form": {
+      "applicant": "沙倩",
+      "projectName": "山东省医学会2026年病理学分会病理读片会",
+      "hospital": "山东大学齐鲁医院",
+      "kol": "高鹏",
+      "region": "北区",
+      "district": "北区KA",
+      "meetingDate": "2026-08-14",
+      "requestAmount": "3",
+      "meetingLevel": "省级会议",
+      "academicRights": "专题讲座/病例分享",
+      "expertLevel": "国家级专家",
+      "productType": "成熟产品",
+      "hospitalValue": "区域重点医院",
+      "monthlySales": "25",
+      "salesTrend": "增长≥20%",
+      "growthOpportunity": "明确新增检测量/科室/医院目标",
+      "communicationValue": "区域宣传",
+      "executionQuality": "简单执行",
+      "meetingContent": "本次会议由山东省医学会主办，旨在提高病理学专业人员技术水平，通过主旨报告、教学示范、读片会等形式展现病理学新进展、新规范、新理念。预计将有来自全国各地的200名专家同道参加本次会议。"
+    },
+    "details": {
+      "meetingLevel": 6,
+      "academicRights": 8,
+      "expertLevel": 10,
+      "productType": 5,
+      "hospitalValue": 6,
+      "monthlySales": 10,
+      "salesTrend": 5,
+      "growthOpportunity": 10,
+      "communicationValue": 2,
+      "executionQuality": 1
+    },
+    "scores": {
+      "medical": 24,
+      "strategy": 11,
+      "business": 25.0,
+      "communication": 2,
+      "execution": 1,
+      "total": 63.0
+    },
+    "support": {
+      "level": "C+项目",
+      "range": "3-4万",
+      "amount": 3.5
+    },
+    "budgetNote": "申请金额 3.0 万元，与建议金额 3.5 万元基本匹配。",
+    "evaluation": "山东省医学会2026年病理学分会病理读片会，覆盖北区，北区KA，山东大学齐鲁医院，申请人为沙倩，核心 KOL 为高鹏，会议时间为2026-08-14，会议内容包括：本次会议由山东省医学会主办，旨在提高病理学专业人员技术水平，通过主旨报告、教学示范、读片会等形式展现病理学新进展、新规范、新理念。预计将有来自全国各地的200名专家同道参加本次会议。。本次评估中，医学价值 24 分、战略价值 11 分、商业价值 25 分、传播价值 2 分、执行质量 1 分，综合评分 63 分，评定为C+项目。结合医院战略价值、产品推广需求及业务增长潜力，建议支持额度为3-4万，建议支持金额 3.5 万元。申请金额 3.0 万元，与建议金额 3.5 万元基本匹配。可谨慎支持，建议压实具体执行方案，优先控制费用与资源投入。",
+    "excelRow": 17,
+    "serverSavedAt": "2026-07-17T14:37:56"
+  },
+  {
+    "id": "app-1784268880085-a56dc13637e5b",
+    "status": "saved",
+    "updatedAt": "2026-07-17T06:14:40.085Z",
+    "form": {
+      "applicant": "孙希",
+      "projectName": "中国医师协会医学遗传医师分会",
+      "hospital": "南大二附院",
+      "kol": "分子实验室邹叶青",
+      "region": "东二区",
+      "district": "闽赣区",
+      "meetingDate": "2026-11-12",
+      "requestAmount": "4",
+      "meetingLevel": "省级会议",
+      "academicRights": "物料展示",
+      "expertLevel": "省级专家",
+      "productType": "重点增长产品",
+      "hospitalValue": "区域重点医院",
+      "monthlySales": "60",
+      "salesTrend": "稳定",
+      "growthOpportunity": "推动产品落地",
+      "communicationValue": "区域宣传",
+      "executionQuality": "有目标计划",
+      "meetingContent": "中国医师协会医学遗传医师分会，参会人员300左右。覆盖肿瘤，遗传，病理相关专家。会议赞助南大二附院，合作3年，业绩逐年增长，期望突破700W/年。目前院内196 、脑胶、血液肿瘤，196占比80%，血液20%。会议合作科室分子实验室，科室每年会议一次，要求硬性必须参与并支持，来维护与科室合作。目前月销量55W—60W/月，希望通过入院NTRK和TMB，把院内产品线补充完整，从而增长销量。"
+    },
+    "details": {
+      "meetingLevel": 6,
+      "academicRights": 2,
+      "expertLevel": 7,
+      "productType": 8,
+      "hospitalValue": 6,
+      "monthlySales": 25,
+      "salesTrend": 3,
+      "growthOpportunity": 8,
+      "communicationValue": 2,
+      "executionQuality": 3
+    },
+    "scores": {
+      "medical": 15,
+      "strategy": 14,
+      "business": 36.0,
+      "communication": 2,
+      "execution": 3,
+      "total": 70.0
+    },
+    "support": {
+      "level": "B级项目",
+      "range": "4-5万",
+      "amount": 4.5
+    },
+    "budgetNote": "申请金额 4.0 万元，与建议金额 4.5 万元基本匹配。",
+    "evaluation": "中国医师协会医学遗传医师分会，覆盖东二区，闽赣区，南大二附院，申请人为孙希，核心 KOL 为分子实验室邹叶青，会议时间为2026-11-12，会议内容包括：中国医师协会医学遗传医师分会，参会人员300左右。覆盖肿瘤，遗传，病理相关专家。会议赞助南大二附院，合作3年，业绩逐年增长，期望突破700W/年。目前院内196 、脑胶、血液肿瘤，196占比80%，血液20%。会议合作科室分子实验室，科室每年会议一次，要求硬性必须参与并支持，来维护与科室合作。目前月销量55W—60W/月，希望通过入院NTRK和TMB，把院内产品线补充完整，从而增长销量。。本次评估中，医学价值 15 分、战略价值 14 分、商业价值 36 分、传播价值 2 分、执行质量 3 分，综合评分 70 分，评定为B级项目。结合医院战略价值、产品推广需求及业务增长潜力，建议支持额度为4-5万，建议支持金额 4.5 万元。申请金额 4.0 万元，与建议金额 4.5 万元基本匹配。建议支持，但需明确预算边界和可量化产出目标。",
+    "excelRow": 16,
+    "serverSavedAt": "2026-07-17T14:14:40"
+  },
+  {
+    "id": "app-1784183184077-01fb92d20e2b1",
+    "status": "saved",
+    "updatedAt": "2026-07-16T06:26:24.077Z",
+    "form": {
+      "applicant": "张开振",
+      "projectName": "2026第九届广济胸外论",
+      "hospital": "浙江省抗癌协会主办、浙江大学医学院附属第二医院承办",
+      "kol": "范军强",
+      "region": "东二区",
+      "district": "杭州三区",
+      "meetingDate": "2026-07-17",
+      "requestAmount": "10",
+      "meetingLevel": "国家级会议",
+      "academicRights": "展台",
+      "expertLevel": "省级专家",
+      "productType": "战略核心产品",
+      "hospitalValue": "区域重点医院",
+      "monthlySales": "30",
+      "salesTrend": "稳定",
+      "growthOpportunity": "客户维护",
+      "communicationValue": "区域宣传",
+      "executionQuality": "有目标计划",
+      "meetingContent": "关于东二区-张开振申请的“2026第九届广济胸外论坛”，由浙江省抗癌协会主办、浙江大学医学院附属第二医院承办，邀请国内外行业内知名专家学者做学术报告和交流，人员大概300人，申请市场部支持10w\n\n【合作背景】范军强主任浙二胸外科科主任，滨江滨区主任，肺癌年手术量2600台，目前院内全用世和一号，对公司很支持。该会议是他一年一次最重要会议。邀请国内玩胸外肿瘤专家学术讨论交流。另外竞品燃石，臻和马上进院，对我们也会有一些冲击。\n\n【参会权益】核心位置1.8米展台、企业宣传资料放入报道资料袋\n\n【销量趋势】近半年销量稳定在30万左右\n\n【会议目标】\n目前销量：31万（月均60多例患者）；销量目标：35万/月\n稳住当前销量，扛住竞品冲击，把院外部分转换院内"
+    },
+    "details": {
+      "meetingLevel": 8,
+      "academicRights": 4,
+      "expertLevel": 7,
+      "productType": 10,
+      "hospitalValue": 6,
+      "monthlySales": 15,
+      "salesTrend": 3,
+      "growthOpportunity": 3,
+      "communicationValue": 2,
+      "executionQuality": 3
+    },
+    "scores": {
+      "medical": 19,
+      "strategy": 16,
+      "business": 21.0,
+      "communication": 2,
+      "execution": 3,
+      "total": 61.0
+    },
+    "support": {
+      "level": "C+项目",
+      "range": "3-4万",
+      "amount": 3.5
+    },
+    "budgetNote": "申请金额 10.0 万元，高于建议金额 3.5 万元，建议补充更强权益或压缩预算。",
+    "evaluation": "2026第九届广济胸外论，覆盖东二区，杭州三区，浙江省抗癌协会主办、浙江大学医学院附属第二医院承办，申请人为张开振，核心 KOL 为范军强，会议时间为2026-07-17，会议内容包括：关于东二区-张开振申请的“2026第九届广济胸外论坛”，由浙江省抗癌协会主办、浙江大学医学院附属第二医院承办，邀请国内外行业内知名专家学者做学术报告和交流，人员大概300人，申请市场部支持10w\n\n【合作背景】范军强主任浙二胸外科科主任，滨江滨区主任，肺癌年手术量2600台，目前院内全用世和一号，对公司很支持。该会议是他一年一次最重要会议。邀请国内玩胸外肿瘤专家学术讨论交流。另外竞品燃石，臻和马上进院，对我们也会有一些冲击。\n\n【参会权益】核心位置1.8米展台、企业宣传资料放入报道资料袋\n\n【销量趋势】近半年销量稳定在30万左右\n\n【会议目标】\n目前销量：31万（月均60多例患者）；销量目标：35万/月\n稳住当前销量，扛住竞品冲击，把院外部分转换院内。本次评估中，医学价值 19 分、战略价值 16 分、商业价值 21 分、传播价值 2 分、执行质量 3 分，综合评分 61 分，评定为C+项目。结合医院战略价值、产品推广需求及业务增长潜力，建议支持额度为3-4万，建议支持金额 3.5 万元。申请金额 10.0 万元，高于建议金额 3.5 万元，建议补充更强权益或压缩预算。可谨慎支持，建议压实具体执行方案，优先控制费用与资源投入。",
+    "excelRow": 12,
+    "serverSavedAt": "2026-07-16T14:26:24"
+  },
+  {
+    "id": "app-1784172010626-fe7b06c9fbbe48",
+    "status": "saved",
+    "updatedAt": "2026-07-16T03:20:10.626Z",
+    "form": {
+      "applicant": "唐宇君",
+      "projectName": "淋巴瘤学术年会",
+      "hospital": "南方医院",
+      "kol": "冯茹",
+      "region": "南区",
+      "district": "广州一区",
+      "meetingDate": "2026-07-17",
+      "requestAmount": "3",
+      "meetingLevel": "省级会议",
+      "academicRights": "展台",
+      "expertLevel": "省级专家",
+      "productType": "重点增长产品",
+      "hospitalValue": "区域重点医院",
+      "monthlySales": "20",
+      "salesTrend": "稳定",
+      "growthOpportunity": "明确新增检测量/科室/医院目标",
+      "communicationValue": "区域宣传",
+      "executionQuality": "有目标计划",
+      "meetingContent": ""
+    },
+    "details": {
+      "meetingLevel": 6,
+      "academicRights": 4,
+      "expertLevel": 7,
+      "productType": 8,
+      "hospitalValue": 6,
+      "monthlySales": 10,
+      "salesTrend": 3,
+      "growthOpportunity": 10,
+      "communicationValue": 2,
+      "executionQuality": 3
+    },
+    "scores": {
+      "medical": 17,
+      "strategy": 14,
+      "business": 23,
+      "communication": 2,
+      "execution": 3,
+      "total": 59
+    },
+    "support": {
+      "level": "C级项目",
+      "range": "2-3万",
+      "amount": 3
+    },
+    "budgetNote": "申请金额 3.0 万元，与建议金额 3.0 万元基本匹配。",
+    "evaluation": "淋巴瘤学术年会，覆盖南区，广州一区，南方医院，申请人为唐宇君，核心 KOL 为冯茹，会议时间为2026-07-17，会议内容围绕重点增长产品开展医学推广与客户教育。本次评估中，医学价值 17 分、战略价值 14 分、商业价值 21 分、传播价值 2 分、执行质量 3 分，综合评分 57 分，评定为C级项目。结合医院战略价值、产品推广需求及业务增长潜力，建议支持额度为2-3万，建议支持金额 3.0 万元。申请金额 3.0 万元，与建议金额 3.0 万元基本匹配。可谨慎支持，建议压实具体执行方案，优先控制费用与资源投入。",
+    "excelRow": 11,
+    "serverSavedAt": "2026-07-16T11:20:12"
+  }
+]

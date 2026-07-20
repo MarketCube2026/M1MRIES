@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>过往申请一览</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f4;
+      --panel: #ffffff;
+      --soft: #f0f6f1;
+      --ink: #1f2523;
+      --muted: #65716c;
+      --line: #d9dfd8;
+      --accent: #157a6e;
+      --accent-dark: #0f5d54;
+      --gold: #b8860b;
+      --gold-soft: #fff5d8;
+      --red: #b42318;
+      --shadow: 0 14px 40px rgba(31, 37, 35, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 36px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.12;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 14px;
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+      transition: 120ms ease;
+      white-space: nowrap;
+    }
+
+    .button:hover {
+      border-color: var(--accent);
+      color: var(--accent-dark);
+    }
+
+    .button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      min-height: 116px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .card-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .card-value {
+      margin-top: 12px;
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    .card-foot {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .visual-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfa;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.3;
+      font-weight: 800;
+    }
+
+    .bars {
+      display: grid;
+      gap: 12px;
+      padding: 16px 18px 18px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 52px;
+      gap: 12px;
+      align-items: center;
+      min-height: 30px;
+    }
+
+    .bar-name {
+      color: #33413c;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #e4e9e5;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .bar-value {
+      color: var(--muted);
+      text-align: right;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfa;
+    }
+
+    .search {
+      width: min(340px, 100%);
+      min-height: 38px;
+      border: 1px solid #cbd5cf;
+      border-radius: 8px;
+      padding: 8px 10px;
+      outline: none;
+    }
+
+    .search:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(21, 122, 110, 0.14);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1280px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #eef5f0;
+      color: #33413c;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: #fbfcfa;
+    }
+
+    .level {
+      display: inline-flex;
+      min-height: 24px;
+      align-items: center;
+      border-radius: 999px;
+      padding: 0 9px;
+      background: var(--gold-soft);
+      color: #755400;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .link-button {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--accent-dark);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .link-button.danger {
+      color: var(--red);
+    }
+
+    .empty {
+      padding: 34px 18px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 980px) {
+      .summary-grid,
+      .visual-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100% - 20px, 680px);
+        padding-top: 16px;
+      }
+
+      .topbar,
+      .table-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .summary-grid,
+      .visual-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <h1>过往申请一览</h1>
+        <p class="subtitle">会议资源支持申请的可视化汇总与记录管理</p>
+      </div>
+      <div class="actions">
+        <button class="button" type="button" id="backToForm">返回评分页</button>
+        <button class="button" type="button" id="refreshData">刷新</button>
+        <button class="button primary" type="button" id="newApplication">新建申请</button>
+      </div>
+    </header>
+
+    <section class="summary-grid" aria-label="申请概览">
+      <div class="summary-card">
+        <div class="card-label">保存申请数</div>
+        <div class="card-value" id="totalCount">0</div>
+        <div class="card-foot">浏览器本地记录</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-label">平均评分</div>
+        <div class="card-value" id="avgScore">0</div>
+        <div class="card-foot">综合评分均值</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-label">建议支持合计</div>
+        <div class="card-value" id="totalBudget">0</div>
+        <div class="card-foot">万元</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-label">最高价值项目</div>
+        <div class="card-value" id="topScore">-</div>
+        <div class="card-foot" id="topProject">暂无记录</div>
+      </div>
+    </section>
+
+    <section class="visual-grid" aria-label="可视化分布">
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">资源等级分布</h2>
+        </div>
+        <div class="bars" id="levelBars"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">区域分布</h2>
+        </div>
+        <div class="bars" id="regionBars"></div>
+      </section>
+    </section>
+
+    <section class="panel">
+      <div class="table-toolbar">
+        <div>
+          <h2 class="panel-title">申请记录</h2>
+          <div class="card-foot" id="tableCount">共 0 条记录，等待同步</div>
+        </div>
+        <div class="actions">
+          <input class="search" id="searchInput" type="search" placeholder="搜索区域、医院、KOL、项目">
+          <button class="button" type="button" id="exportHistory">导出</button>
+          <button class="button" type="button" id="clearHistory">清空记录</button>
+        </div>
+      </div>
+      <div class="table-wrap" id="tableWrap">
+        <table aria-label="过往申请记录表">
+          <thead>
+            <tr>
+              <th>区域</th>
+              <th>地区</th>
+              <th>申请人</th>
+              <th>医院/会议单位</th>
+              <th>KOL</th>
+              <th>项目名称</th>
+              <th>会议时间</th>
+              <th>申请金额</th>
+              <th>综合评分</th>
+              <th>建议支持额度</th>
+              <th>建议支持金额</th>
+              <th>更新时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="emptyState" hidden>暂无过往申请。请返回评分页填写并保存申请。</div>
+    </section>
+  </main>
+
+  <script>
+    const storageKey = "meetingSupportApplications";
+    const elements = {
+      totalCount: document.getElementById("totalCount"),
+      avgScore: document.getElementById("avgScore"),
+      totalBudget: document.getElementById("totalBudget"),
+      topScore: document.getElementById("topScore"),
+      topProject: document.getElementById("topProject"),
+      levelBars: document.getElementById("levelBars"),
+      regionBars: document.getElementById("regionBars"),
+      tableCount: document.getElementById("tableCount"),
+      searchInput: document.getElementById("searchInput"),
+      historyBody: document.getElementById("historyBody"),
+      tableWrap: document.getElementById("tableWrap"),
+      emptyState: document.getElementById("emptyState")
+    };
+
+    let applications = [];
+
+    async function loadApplications() {
+      try {
+        const response = await fetch("/api/applications", { cache: "no-store" });
+        const payload = await response.json();
+        if (response.ok && payload.ok && Array.isArray(payload.records)) {
+          localStorage.setItem(storageKey, JSON.stringify(payload.records));
+          return payload.records;
+        }
+      } catch (error) {
+        const raw = localStorage.getItem(storageKey);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      }
+      return [];
+    }
+
+    function persistApplications() {
+      localStorage.setItem(storageKey, JSON.stringify(applications));
+    }
+
+    function sameApplications(nextApplications) {
+      try {
+        return JSON.stringify(applications) === JSON.stringify(nextApplications);
+      } catch (error) {
+        return false;
+      }
+    }
+
+    async function syncApplications(options = {}) {
+      const nextApplications = await loadApplications();
+      if (!sameApplications(nextApplications) || options.force) {
+        applications = nextApplications;
+        render();
+      } else {
+        updateSyncStatus(filteredApplications().length);
+      }
+    }
+
+    function updateSyncStatus(count) {
+      const now = new Date();
+      const pad = (num) => String(num).padStart(2, "0");
+      const time = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      elements.tableCount.textContent = `共 ${count} 条记录，已自动同步 ${time}`;
+    }
+
+    function formatAmount(value) {
+      const amount = Number(value);
+      if (!Number.isFinite(amount) || amount <= 0) return "-";
+      return `${amount.toFixed(1)} 万元`;
+    }
+
+    function formatDateTime(iso) {
+      if (!iso) return "-";
+      const date = new Date(iso);
+      if (Number.isNaN(date.getTime())) return "-";
+      const pad = (num) => String(num).padStart(2, "0");
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    function text(record) {
+      const form = record.form || {};
+      return [
+        form.region,
+        form.district,
+        form.applicant,
+        form.hospital,
+        form.kol,
+        form.projectName,
+        form.meetingDate,
+        record.support && record.support.range,
+        record.support && record.support.level
+      ].filter(Boolean).join(" ").toLowerCase();
+    }
+
+    function filteredApplications() {
+      const keyword = elements.searchInput.value.trim().toLowerCase();
+      if (!keyword) return applications;
+      return applications.filter((record) => text(record).includes(keyword));
+    }
+
+    function makeBar(name, count, max) {
+      const row = document.createElement("div");
+      row.className = "bar-row";
+
+      const label = document.createElement("div");
+      label.className = "bar-name";
+      label.textContent = name || "未填写";
+
+      const track = document.createElement("div");
+      track.className = "bar-track";
+      const fill = document.createElement("div");
+      fill.className = "bar-fill";
+      fill.style.width = max ? `${Math.max(8, (count / max) * 100)}%` : "0";
+      track.appendChild(fill);
+
+      const value = document.createElement("div");
+      value.className = "bar-value";
+      value.textContent = count;
+
+      row.appendChild(label);
+      row.appendChild(track);
+      row.appendChild(value);
+      return row;
+    }
+
+    function renderBars(container, entries) {
+      container.textContent = "";
+      if (!entries.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "暂无数据";
+        container.appendChild(empty);
+        return;
+      }
+      const max = Math.max(...entries.map((entry) => entry[1]));
+      entries.forEach(([name, count]) => container.appendChild(makeBar(name, count, max)));
+    }
+
+    function countBy(records, getter) {
+      const map = new Map();
+      records.forEach((record) => {
+        const key = getter(record) || "未填写";
+        map.set(key, (map.get(key) || 0) + 1);
+      });
+      return [...map.entries()].sort((a, b) => b[1] - a[1]);
+    }
+
+    function renderSummary(records) {
+      const count = records.length;
+      const totalScore = records.reduce((sum, record) => sum + Number((record.scores || {}).total || 0), 0);
+      const totalBudget = records.reduce((sum, record) => sum + Number((record.support || {}).amount || 0), 0);
+      const top = records.reduce((best, record) => {
+        if (!best) return record;
+        return Number((record.scores || {}).total || 0) > Number((best.scores || {}).total || 0) ? record : best;
+      }, null);
+
+      elements.totalCount.textContent = count;
+      elements.avgScore.textContent = count ? Math.round(totalScore / count) : 0;
+      elements.totalBudget.textContent = totalBudget.toFixed(1);
+      elements.topScore.textContent = top ? `${(top.scores || {}).total || 0}` : "-";
+      elements.topProject.textContent = top ? ((top.form || {}).projectName || "未命名申请") : "暂无记录";
+
+      renderBars(elements.levelBars, countBy(records, (record) => (record.support || {}).level || (record.support || {}).range));
+      renderBars(elements.regionBars, countBy(records, (record) => (record.form || {}).region));
+    }
+
+    function tableCell(textValue) {
+      const cell = document.createElement("td");
+      cell.textContent = textValue || "-";
+      return cell;
+    }
+
+    function levelCell(record) {
+      const cell = document.createElement("td");
+      const pill = document.createElement("span");
+      pill.className = "level";
+      pill.textContent = (record.support || {}).range || "-";
+      cell.appendChild(pill);
+      return cell;
+    }
+
+    function actionCell(record) {
+      const cell = document.createElement("td");
+      const wrap = document.createElement("div");
+      wrap.className = "row-actions";
+
+      const loadButton = document.createElement("button");
+      loadButton.className = "link-button";
+      loadButton.type = "button";
+      loadButton.textContent = "载入";
+      loadButton.addEventListener("click", () => {
+        sessionStorage.setItem("meetingSupportLoadRecord", JSON.stringify(record));
+        window.location.href = "index.html";
+      });
+
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "link-button danger";
+      deleteButton.type = "button";
+      deleteButton.textContent = "删除";
+      deleteButton.addEventListener("click", async () => {
+        try {
+          const response = await fetch(`/api/applications?id=${encodeURIComponent(record.id)}`, { method: "DELETE" });
+          const payload = await response.json();
+          if (response.ok && payload.ok && Array.isArray(payload.records)) {
+            applications = payload.records;
+            persistApplications();
+            render();
+          }
+        } catch (error) {
+          window.alert("删除失败，请确认服务正常运行。");
+        }
+      });
+
+      wrap.appendChild(loadButton);
+      wrap.appendChild(deleteButton);
+      cell.appendChild(wrap);
+      return cell;
+    }
+
+    function renderTable(records) {
+      elements.historyBody.textContent = "";
+      updateSyncStatus(records.length);
+      elements.emptyState.hidden = records.length > 0;
+      elements.tableWrap.hidden = records.length === 0;
+
+      records.forEach((record) => {
+        const form = record.form || {};
+        const row = document.createElement("tr");
+        row.appendChild(tableCell(form.region));
+        row.appendChild(tableCell(form.district));
+        row.appendChild(tableCell(form.applicant));
+        row.appendChild(tableCell(form.hospital));
+        row.appendChild(tableCell(form.kol));
+        row.appendChild(tableCell(form.projectName || "未命名申请"));
+        row.appendChild(tableCell(form.meetingDate));
+        row.appendChild(tableCell(formatAmount(form.requestAmount)));
+        row.appendChild(tableCell(`${(record.scores || {}).total || 0} 分`));
+        row.appendChild(levelCell(record));
+        row.appendChild(tableCell(`${Number((record.support || {}).amount || 0).toFixed(1)} 万元`));
+        row.appendChild(tableCell(formatDateTime(record.updatedAt)));
+        row.appendChild(actionCell(record));
+        elements.historyBody.appendChild(row);
+      });
+    }
+
+    function csvValue(value) {
+      const text = String(value ?? "").replace(/\r?\n/g, " ");
+      return `"${text.replace(/"/g, '""')}"`;
+    }
+
+    function exportHistory() {
+      const records = filteredApplications();
+      const headers = [
+        "区域",
+        "地区",
+        "申请人",
+        "医院/会议单位",
+        "KOL",
+        "项目名称",
+        "会议时间",
+        "申请金额(万元)",
+        "综合评分",
+        "建议支持额度",
+        "建议支持金额(万元)",
+        "更新时间",
+        "汇报评价"
+      ];
+      const rows = records.map((record) => {
+        const form = record.form || {};
+        const scores = record.scores || {};
+        const support = record.support || {};
+        return [
+          form.region,
+          form.district,
+          form.applicant,
+          form.hospital,
+          form.kol,
+          form.projectName,
+          form.meetingDate,
+          form.requestAmount,
+          scores.total,
+          support.range,
+          support.amount,
+          formatDateTime(record.updatedAt),
+          record.evaluation
+        ];
+      });
+
+      const csv = [headers, ...rows].map((row) => row.map(csvValue).join(",")).join("\r\n");
+      const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const stamp = new Date().toISOString().slice(0, 10);
+      link.href = url;
+      link.download = `过往申请一览_${stamp}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function render() {
+      const records = filteredApplications();
+      renderSummary(records);
+      renderTable(records);
+    }
+
+    document.getElementById("backToForm").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+    document.getElementById("newApplication").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+    document.getElementById("refreshData").addEventListener("click", () => {
+      syncApplications({ force: true });
+    });
+    document.getElementById("clearHistory").addEventListener("click", async () => {
+      if (!applications.length) return;
+      const confirmed = window.confirm("确认清空全部过往申请记录？");
+      if (!confirmed) return;
+      try {
+        const response = await fetch("/api/clear-applications", { method: "POST" });
+        const payload = await response.json();
+        if (response.ok && payload.ok) {
+          applications = [];
+          persistApplications();
+          render();
+        }
+      } catch (error) {
+        window.alert("清空失败，请确认服务正常运行。");
+      }
+    });
+    document.getElementById("exportHistory").addEventListener("click", exportHistory);
+    elements.searchInput.addEventListener("input", render);
+    window.addEventListener("storage", (event) => {
+      if (event.key === storageKey) syncApplications({ force: true });
+    });
+    window.addEventListener("focus", () => syncApplications());
+    window.addEventListener("pageshow", () => syncApplications());
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) syncApplications();
+    });
+    window.setInterval(() => syncApplications(), 2000);
+
+    syncApplications({ force: true });
+  </script>
+</body>
+</html>

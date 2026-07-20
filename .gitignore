@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.log
+http-*.log
+http-server*.log
+*.tmp
+~$*.xlsx
