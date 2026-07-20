@@ -9,15 +9,16 @@
 1. 在 Supabase 创建项目。
 2. 打开 Supabase SQL Editor，执行 `supabase_schema.sql`。
 3. 在 Supabase Auth 中创建内部同事账号。
-4. 修改 `cloud-config.js`：
+4. 修改 `cloud-config.js`，填入 Supabase anon public key：
 
 ```js
 window.MEETING_SUPPORT_CLOUD_CONFIG = {
   enabled: true,
-  supabaseUrl: "https://你的项目.supabase.co",
+  supabaseUrl: "https://liqbfzbrjyvccjcktaxy.supabase.co",
   supabaseAnonKey: "你的 anon public key",
   tableName: "applications",
-  authRequired: true
+  authRequired: true,
+  cloudOnly: true
 };
 ```
 
@@ -25,21 +26,15 @@ window.MEETING_SUPPORT_CLOUD_CONFIG = {
 
 配置完成后，同事通过 GitHub Pages 公网地址访问，申请记录会保存到 Supabase 云数据库，电脑关机或本地服务关闭不会影响使用。
 
-### 本地/内网版本
+### 当前模式
 
-如果 `cloud-config.js` 中 `enabled` 为 `false`，系统会继续兼容当前本地服务：
-
-- 评分页：http://localhost:8036/index.html
-- 过往申请页：http://localhost:8036/history.html
-- 健康检查：http://localhost:8036/api/health
-
-本地服务启动后，数据会写入 `applications.json`，并追加到 `资源支持价值评估评分表2026版.xlsx`。
+当前已启用 `cloudOnly: true`，页面保存、读取、删除、清空均只访问 Supabase 云数据库，不再依赖本地 Python 服务或本地 Excel。
 
 ## 数据说明
 
 - 公网版本以 Supabase `applications` 表作为主数据源。
 - 过往申请页从云端读取同一份记录，支持查看、删除、清空和导出 CSV。
-- 本地 Excel 不再作为公网版本的实时数据库；如需 Excel 文件，可在过往申请页导出。
+- 本地 Excel 不再作为实时数据库；如需 Excel 文件，可在过往申请页导出。
 
 ## GitHub Pages 注意事项
 
@@ -54,6 +49,6 @@ GitHub Pages 只能托管静态网页，不能运行 Python 后端，也不能�
 - `index.html`：评分申请页面
 - `history.html`：过往申请一览页面
 - `cloud-config.js`：云端配置
-- `cloud-data.js`：云端/本地兼容数据层
+- `cloud-data.js`：Supabase 云端数据层
 - `supabase_schema.sql`：Supabase 建表和权限 SQL
-- `excel_server.py`：本地/内网兼容服务
+- `excel_server.py`：历史本地服务文件，公网云端模式不再使用

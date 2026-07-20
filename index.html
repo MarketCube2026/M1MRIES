@@ -1045,7 +1045,7 @@
       try {
         const result = await MeetingSupportData.listRecords(storageKey);
         savedApplications = Array.isArray(result.records) ? result.records : [];
-        dataSourceLabel = result.source === "cloud" ? "云端数据库" : result.source === "local-server" ? "本地服务" : "浏览器缓存";
+        dataSourceLabel = result.source === "cloud" ? "云端数据库" : "云端未连接";
         persistApplications();
         renderApplicationTable();
       } catch (error) {
@@ -1245,7 +1245,7 @@
       try {
         const result = window.MeetingSupportData
           ? await MeetingSupportData.saveRecord(saved, storageKey)
-          : { ok: true, source: "browser", record: saved };
+          : { ok: false, source: "cloud", record: saved };
         if (result.record) {
           savedApplications = [result.record, ...savedApplications.filter((record) => record.id !== result.record.id)];
           persistApplications();
@@ -1253,13 +1253,14 @@
         }
         if (result.source === "cloud") {
           elements.copyState.textContent = "当前申请已保存，并已同步至云端数据库。";
-        } else if (result.source === "local-server" && result.row) {
-          elements.copyState.textContent = `当前申请已保存，并已同步至本地 Excel 第 ${result.row} 行。`;
         } else {
-          elements.copyState.textContent = "当前申请已保存到浏览器缓存；配置 Supabase 后可自动同步到公网云端。";
+          elements.copyState.textContent = "当前申请未同步到云端，请检查 Supabase 配置。";
         }
       } catch (error) {
-        elements.copyState.textContent = `保存到云端失败，当前记录已保留在浏览器缓存：${error.message}`;
+        savedApplications = savedApplications.filter((record) => record.id !== saved.id);
+        persistApplications();
+        renderApplicationTable();
+        elements.copyState.textContent = `保存到云端失败：${error.message}`;
       }
     }
 

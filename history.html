@@ -357,7 +357,7 @@
       <div class="summary-card">
         <div class="card-label">保存申请数</div>
         <div class="card-value" id="totalCount">0</div>
-        <div class="card-foot">浏览器本地记录</div>
+        <div class="card-foot">云端数据库记录</div>
       </div>
       <div class="summary-card">
         <div class="card-label">平均评分</div>
@@ -457,13 +457,11 @@
         const result = window.MeetingSupportData
           ? await MeetingSupportData.listRecords(storageKey)
           : { records: [] };
-        dataSourceLabel = result.source === "cloud" ? "云端数据库" : result.source === "local-server" ? "本地服务" : "浏览器缓存";
+        dataSourceLabel = result.source === "cloud" ? "云端数据库" : "云端未连接";
         if (Array.isArray(result.records)) return result.records;
       } catch (error) {
-        const raw = localStorage.getItem(storageKey);
-        const parsed = raw ? JSON.parse(raw) : [];
-        dataSourceLabel = "浏览器缓存";
-        return Array.isArray(parsed) ? parsed : [];
+        dataSourceLabel = `云端连接失败：${error.message}`;
+        return [];
       }
       return [];
     }

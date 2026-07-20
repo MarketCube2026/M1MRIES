@@ -6,6 +6,19 @@
     return Boolean(config.enabled && config.supabaseUrl && config.supabaseAnonKey);
   }
 
+  function isCloudOnly() {
+    return config.cloudOnly !== false;
+  }
+
+  function assertConfigured() {
+    if (!config.enabled || !config.supabaseUrl) {
+      throw new Error("云端数据库尚未启用，请检查 cloud-config.js。");
+    }
+    if (!config.supabaseAnonKey) {
+      throw new Error("Supabase anon public key 尚未配置，请在 cloud-config.js 填入 supabaseAnonKey。");
+    }
+  }
+
   function tableName() {
     return config.tableName || "applications";
   }
@@ -182,107 +195,55 @@
     };
   }
 
-  async function fetchLocalApi(path, options) {
-    const response = await fetch(path, options);
-    const payload = await response.json();
-    if (!response.ok || !payload.ok) {
-      throw new Error(payload.error || "本地服务请求失败");
-    }
-    return payload;
-  }
-
   async function listRecords(storageKey) {
-    if (isConfigured()) {
-      const response = await fetch(endpoint(`/rest/v1/${tableName()}?select=*&order=updated_at.desc`), {
-        headers: headers(),
-        cache: "no-store"
-      });
-      if (!response.ok) throw new Error(await response.text());
-      const rows = await response.json();
-      const records = Array.isArray(rows) ? rows.map(fromDbRow) : [];
-      persistLocal(storageKey, records);
-      return { ok: true, source: "cloud", records };
-    }
-
-    try {
-      const payload = await fetchLocalApi("/api/applications", { cache: "no-store" });
-      const records = Array.isArray(payload.records) ? payload.records : [];
-      persistLocal(storageKey, records);
-      return { ok: true, source: "local-server", records };
-    } catch (error) {
-      return { ok: true, source: "browser", records: localList(storageKey), warning: error.message };
-    }
+    assertConfigured();
+    const response = await fetch(endpoint(`/rest/v1/${tableName()}?select=*&order=updated_at.desc`), {
+      headers: headers(),
+      cache: "no-store"
+    });
+    if (!response.ok) throw new Error(await response.text());
+    const rows = await response.json();
+    const records = Array.isArray(rows) ? rows.map(fromDbRow) : [];
+    persistLocal(storageKey, records);
+    return { ok: true, source: "cloud", records };
   }
 
   async function saveRecord(record, storageKey) {
-    if (isConfigured()) {
-      const response = await fetch(endpoint(`/rest/v1/${tableName()}`), {
-        method: "POST",
-        headers: headers({ Prefer: "return=representation" }),
-        body: JSON.stringify(toDbRow(record))
-      });
-      if (!response.ok) throw new Error(await response.text());
-      const rows = await response.json();
-      const saved = rows && rows[0] ? fromDbRow(rows[0]) : record;
-      const local = [saved, ...localList(storageKey).filter((item) => item.id !== saved.id)];
-      persistLocal(storageKey, local);
-      return { ok: true, source: "cloud", record: saved };
-    }
-
-    try {
-      const payload = await fetchLocalApi("/api/save-excel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(record)
-      });
-      return { ok: true, source: "local-server", row: payload.row, record };
-    } catch (error) {
-      return { ok: true, source: "browser", warning: error.message, record };
-    }
+    assertConfigured();
+    const response = await fetch(endpoint(`/rest/v1/${tableName()}`), {
+      method: "POST",
+      headers: headers({ Prefer: "return=representation" }),
+      body: JSON.stringify(toDbRow(record))
+    });
+    if (!response.ok) throw new Error(await response.text());
+    const rows = await response.json();
+    const saved = rows && rows[0] ? fromDbRow(rows[0]) : record;
+    const local = [saved, ...localList(storageKey).filter((item) => item.id !== saved.id)];
+    persistLocal(storageKey, local);
+    return { ok: true, source: "cloud", record: saved };
   }
 
   async function deleteRecord(id, storageKey) {
-    if (isConfigured()) {
-      const response = await fetch(endpoint(`/rest/v1/${tableName()}?id=eq.${encodeURIComponent(id)}`), {
-        method: "DELETE",
-        headers: headers()
-      });
-      if (!response.ok) throw new Error(await response.text());
-      const records = localList(storageKey).filter((record) => record.id !== id);
-      persistLocal(storageKey, records);
-      return { ok: true, source: "cloud", records };
-    }
-
-    try {
-      const payload = await fetchLocalApi(`/api/applications?id=${encodeURIComponent(id)}`, { method: "DELETE" });
-      const records = Array.isArray(payload.records) ? payload.records : [];
-      persistLocal(storageKey, records);
-      return { ok: true, source: "local-server", records };
-    } catch (error) {
-      const records = localList(storageKey).filter((record) => record.id !== id);
-      persistLocal(storageKey, records);
-      return { ok: true, source: "browser", records, warning: error.message };
-    }
+    assertConfigured();
+    const response = await fetch(endpoint(`/rest/v1/${tableName()}?id=eq.${encodeURIComponent(id)}`), {
+      method: "DELETE",
+      headers: headers()
+    });
+    if (!response.ok) throw new Error(await response.text());
+    const records = localList(storageKey).filter((record) => record.id !== id);
+    persistLocal(storageKey, records);
+    return { ok: true, source: "cloud", records };
   }
 
   async function clearRecords(storageKey) {
-    if (isConfigured()) {
-      const response = await fetch(endpoint(`/rest/v1/${tableName()}?id=not.is.null`), {
-        method: "DELETE",
-        headers: headers()
-      });
-      if (!response.ok) throw new Error(await response.text());
-      persistLocal(storageKey, []);
-      return { ok: true, source: "cloud", records: [] };
-    }
-
-    try {
-      await fetchLocalApi("/api/clear-applications", { method: "POST" });
-    } catch (error) {
-      // Browser-only mode can still clear its own cached copy.
-    }
+    assertConfigured();
+    const response = await fetch(endpoint(`/rest/v1/${tableName()}?id=not.is.null`), {
+      method: "DELETE",
+      headers: headers()
+    });
+    if (!response.ok) throw new Error(await response.text());
     persistLocal(storageKey, []);
-    return { ok: true, source: "browser", records: [] };
+    return { ok: true, source: "cloud", records: [] };
   }
 
   async function signIn(email, password) {
@@ -303,7 +264,7 @@
   }
 
   function mountCloudBar(container) {
-    if (!container || !isConfigured()) return;
+    if (!container || !config.enabled || !config.supabaseUrl) return;
     const style = document.createElement("style");
     style.textContent = ".cloud-bar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin:0 0 14px;padding:10px 12px;border:1px solid #d9dfd8;border-radius:8px;background:#fff}.cloud-bar small{color:#65716c}.cloud-login{display:flex;gap:8px;flex-wrap:wrap}.cloud-login input{width:180px;min-height:34px}.cloud-login button{min-height:34px;border:1px solid #d9dfd8;border-radius:8px;background:#fff;padding:0 12px;cursor:pointer}";
     document.head.appendChild(style);
@@ -313,6 +274,10 @@
 
     function render(message) {
       const session = loadSession();
+      if (!config.supabaseAnonKey) {
+        bar.innerHTML = `<small>云端数据库已指定，但尚未填写 Supabase anon public key。请在 cloud-config.js 中配置 supabaseAnonKey 后再保存和查看记录。</small>`;
+        return;
+      }
       if (!config.authRequired) {
         bar.innerHTML = `<small>云端数据已启用：保存后自动同步到 Supabase。</small>`;
         return;
@@ -344,6 +309,7 @@
 
   window.MeetingSupportData = {
     isConfigured,
+    isCloudOnly,
     loadSession,
     mountCloudBar,
     listRecords,

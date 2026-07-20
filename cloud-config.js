@@ -1,7 +1,8 @@
 window.MEETING_SUPPORT_CLOUD_CONFIG = {
-  enabled: false,
-  supabaseUrl: "",
+  enabled: true,
+  supabaseUrl: "https://liqbfzbrjyvccjcktaxy.supabase.co",
   supabaseAnonKey: "",
   tableName: "applications",
-  authRequired: false
+  authRequired: true,
+  cloudOnly: true
 };
