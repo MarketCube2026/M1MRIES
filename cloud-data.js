@@ -44,15 +44,49 @@
     }
   }
 
-  function authHeader() {
+  function isSessionExpiring(session) {
+    if (!session || !session.expires_at) return false;
+    const expiresAtMs = Number(session.expires_at) * 1000;
+    return Number.isFinite(expiresAtMs) && expiresAtMs - Date.now() < 60000;
+  }
+
+  async function refreshSession(session) {
+    if (!session || !session.refresh_token) return null;
+    const response = await fetch(endpoint("/auth/v1/token?grant_type=refresh_token"), {
+      method: "POST",
+      headers: {
+        apikey: config.supabaseAnonKey,
+        Authorization: `Bearer ${config.supabaseAnonKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ refresh_token: session.refresh_token })
+    });
+    if (!response.ok) {
+      saveSession(null);
+      throw new Error("登录状态已过期，请退出后重新登录。");
+    }
+    const nextSession = await response.json();
+    saveSession(nextSession);
+    return nextSession;
+  }
+
+  async function getValidSession() {
     const session = loadSession();
+    if (session && isSessionExpiring(session)) {
+      return refreshSession(session);
+    }
+    return session;
+  }
+
+  function authHeader(session) {
     return session && session.access_token ? `Bearer ${session.access_token}` : `Bearer ${config.supabaseAnonKey}`;
   }
 
-  function headers(extra = {}) {
+  async function headers(extra = {}) {
+    const session = await getValidSession();
     return {
       apikey: config.supabaseAnonKey,
-      Authorization: authHeader(),
+      Authorization: authHeader(session),
       "Content-Type": "application/json",
       ...extra
     };
@@ -198,7 +232,7 @@
   async function listRecords(storageKey) {
     assertConfigured();
     const response = await fetch(endpoint(`/rest/v1/${tableName()}?select=*&order=updated_at.desc`), {
-      headers: headers(),
+      headers: await headers(),
       cache: "no-store"
     });
     if (!response.ok) throw new Error(await response.text());
@@ -212,7 +246,7 @@
     assertConfigured();
     const response = await fetch(endpoint(`/rest/v1/${tableName()}`), {
       method: "POST",
-      headers: headers({ Prefer: "return=representation" }),
+      headers: await headers({ Prefer: "return=representation" }),
       body: JSON.stringify(toDbRow(record))
     });
     if (!response.ok) throw new Error(await response.text());
@@ -227,7 +261,7 @@
     assertConfigured();
     const response = await fetch(endpoint(`/rest/v1/${tableName()}?id=eq.${encodeURIComponent(id)}`), {
       method: "DELETE",
-      headers: headers()
+      headers: await headers()
     });
     if (!response.ok) throw new Error(await response.text());
     const records = localList(storageKey).filter((record) => record.id !== id);
@@ -239,7 +273,7 @@
     assertConfigured();
     const response = await fetch(endpoint(`/rest/v1/${tableName()}?id=not.is.null`), {
       method: "DELETE",
-      headers: headers()
+      headers: await headers()
     });
     if (!response.ok) throw new Error(await response.text());
     persistLocal(storageKey, []);
@@ -250,7 +284,11 @@
     if (!isConfigured()) throw new Error("Supabase 尚未配置");
     const response = await fetch(endpoint("/auth/v1/token?grant_type=password"), {
       method: "POST",
-      headers: headers(),
+      headers: {
+        apikey: config.supabaseAnonKey,
+        Authorization: `Bearer ${config.supabaseAnonKey}`,
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ email, password })
     });
     if (!response.ok) throw new Error(await response.text());
