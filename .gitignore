@@ -5,3 +5,5 @@ http-*.log
 http-server*.log
 *.tmp
 ~$*.xlsx
+
+.vercel
